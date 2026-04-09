@@ -1,0 +1,100 @@
+/* ================= Common Reset & Fonts ================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --font-sans: "Inter", -apple-system, "SF Pro Display", "Helvetica Neue",
+        "Noto Sans SC", BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Code",
+        monospace;
+}
+
+/* ================= Server Address Component ================= */
+.server-address-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.server-address-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: fit-content;
+}
+
+.server-address-note {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-secondary, #86868b);
+    padding-left: 2px;
+}
+
+.server-address {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.45);
+    border: none;
+    border-radius: 12px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: fit-content;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.server-address:hover {
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.server-address:active {
+    transform: scale(0.98);
+}
+
+.address-text {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-color, #1d1d1f);
+    letter-spacing: 0.02em;
+}
+
+.copy-icon {
+    color: var(--text-secondary, #86868b);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.server-address:hover .copy-icon {
+    color: var(--accent-color, #0071e3);
+}
+
+.copy-toast {
+    position: absolute;
+    top: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color, #1d1d1f);
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.copy-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+}
