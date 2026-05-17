@@ -20,7 +20,7 @@ description: 手把手从零搭建互联
 
 ## 一、Napcat 的安装与配置
 
-Napcat 的官方下载页为：https://napneko.github.io/guide/install
+> Napcat 的官方下载页为：https://napneko.github.io/guide/install
 
 Windows 端推荐选择 Napcat.Win.一键版本。官方教程[点这里](https://napneko.github.io/guide/boot/Shell#napcat-win-%E4%B8%80%E9%94%AE%E7%89%88%E6%9C%AC)  
 Linux 端推荐选择 AppImage 版本。官方教程[点这里](https://napneko.github.io/guide/boot/Shell#napcat-appimage)  
@@ -76,4 +76,85 @@ chmod +x QQ-44343_NapCat-v4.18.2-amd64.AppImage
 
 至此，Napcat 就成功安装好了。接下来我们需要将机器人账号登录上去
 
-### 2. 在 Napcat 上登录机器人账号
+### 2. 启动 Napcat
+
+通过上一步中的 `chmod +x` 命令，Napcat 的 AppImage 文件已经有了直接执行的权限。此时，只需要直接输入其 AppImage 文件的相对或绝对路径，即可启动 Napcat 了
+
+```shell
+./QQ-44343_NapCat-v4.18.2-amd64.AppImage 
+# 本文件名只作演示，请根据情况更改
+```
+
+如果启动时显示 `error loading libfuse.so.2`，例如这样的文本：
+
+```
+vm-user@debian:~/bot/napcat$ ./QQ-44343_NapCat-v4.18.2-amd64.AppImage 
+dlopen(): error loading libfuse.so.2
+
+AppImages require FUSE to run. 
+You might still be able to extract the contents of this AppImage 
+if you run it with the --appimage-extract option. 
+See https://github.com/AppImage/AppImageKit/wiki/FUSE 
+for more information
+```
+
+这里显示缺失 `fuse` 库是因为，如果我们的 Linux 发行版较新，则在上一步中的安装时会安装的版本为 `fuse3`，而很多 AppImage，包括 Napcat 的 AppImage 文件需要的是 `fuse3`。我们需要显式的选择 `fuse2` 进行安装
+
+```shell
+sudo apt install libfuse2
+```
+
+![image-20260518045810713](queqiao.assets/image-20260518045810713.png)
+
+正常启动后，终端中将会显示登录二维码、WebUI 链接等信息。
+
+![image-20260518050531885](queqiao.assets/image-20260518050531885.png)
+
+### 3. 登录机器人账号
+
+通过上一步，我们成功启动了 Napcat，终端中显示了登录二维码和 WebUI 链接。前者用于登录，后者用于配置 Napcat
+
+我们先将控制台中显示的 WebUI 链接复制下来，你可以把这个链接通过 QQ 发给自己。注意，这个链接的后半段参数为 WebUI 的密码，所以一定不要泄露了。链接应该类似这样：
+
+```
+http://127.0.0.1:6099/webui?token=62f1f8b5e323
+```
+
+接下来，我们使用手机登录机器人 QQ 号，并扫码登录
+
+当在终端能看到所有机器人同步到的私聊和群聊消息时，就说明登录成功了
+
+我们还需要更多信息才能继续配置 Napcat。下一章，我们将进行 Nonebot 的配置
+
+![vmware_BX5GwnasHE](queqiao.assets/vmware_BX5GwnasHE.png)
+
+## 二、Nonebot 的安装与配置
+
+> Nonebot 的官方配置教程页在这里：[快速上手](https://nonebot.dev/docs/quick-start)
+
+与 Napcat 不同，Nonebot 不是一个独立运行的程序，而是一个 Python 包。这是为了利用 Python 上丰富的生态来为机器人创建多种多样的功能。
+
+### 1. 准备 Python 环境
+
+Nonebot 需要 Python 3.9 以上的版本。我们还需要安装 `pip`, `venv` 和 `python-is-python3`
+
+```shell
+sudo apt update # 更新是为了确保等下安装的包是最新的
+sudo apt install python3 python3-pip python3-venv python-is-python3
+```
+
+安装好后，我们需要使用 pip 来安装 pipx
+
+```shell
+python -m pip install --user pipx
+python -m pipx ensurepath
+```
+
+其中：
+
+- `python3` 是 Python 本体，因为 Python2 和 3 的差异很大，所以所有 Python3 的包都会带 `python3` 的字样。很多系统都会自带 Python3，但以免万一，我们这里还是安装一下（如果已经安装，则不会重复安装）
+- `python3-pip` 是 pip，用于安装第三方包，也可以称作库，是一些社区制作的用于实现特定功能的程序。Nonebot 就是一个第三方包
+- `python3-venv` 是 venv，也就是我们常说的虚拟环境，用于隔离第三方包。使用虚拟环境是为了避免版本冲突、保持系统整洁和避免影响系统本体。只言片语很难说明白为什么要使用虚拟环境，只需要记得，当需要安装 Python 包时，一定要在虚拟环境下进行
+- `python-is-python3` 是一个便利性包，功能很简单，就是添加了一个`软链接`，让你在终端输入 `python` 时，自动指向 `python3`，就不需要每次输入命令时都要加个 3 了
+- `pipx` 是 pipx，与用于安装包/库的 pip 不同，pipx 更侧重于安装成品应用。pip 和 pipx 都是从同一个来源下载包，但 pipx 会自动为安装好后的包创建一个独立的虚拟环境，并且随处可用。一般来说，我们使用 pipx 当应用直接装到系统全局环境里，而将使用 pip 安装的包安装到虚拟环境里
+

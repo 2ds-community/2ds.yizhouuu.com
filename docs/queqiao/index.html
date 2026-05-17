@@ -11,7 +11,9 @@
 <p><strong>鹊桥</strong> 是一款安装在 Minecraft 服务器中的模组/插件。顾名思义，其作为是为 Minecraft 搭起一座与外部世界沟通的桥梁。我们将鹊桥接入 Nonebot，就可以让机器人将消息转发到 Minecraft，亦可将消息转发回 QQ</p>
 <hr>
 <h2 id="一napcat-的安装与配置">一、Napcat 的安装与配置</h2>
+<blockquote>
 <p>Napcat 的官方下载页为：<a href="https://napneko.github.io/guide/install">https://napneko.github.io/guide/install</a></p>
+</blockquote>
 <p>Windows 端推荐选择 Napcat.Win.一键版本。官方教程<a href="https://napneko.github.io/guide/boot/Shell#napcat-win-%E4%B8%80%E9%94%AE%E7%89%88%E6%9C%AC">点这里</a><br>
 Linux 端推荐选择 AppImage 版本。官方教程<a href="https://napneko.github.io/guide/boot/Shell#napcat-appimage">点这里</a><br>
 Mac 和 Termux 端建议选择 Docker 版本。官方教程<a href="https://napneko.github.io/guide/boot/Shell#napcat-docker-linux%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2">点这里</a></p>
@@ -42,7 +44,52 @@ Mac 和 Termux 端建议选择 Docker 版本。官方教程<a href="https://napn
 <span class="line"><span style="color:#6A737D"># 该处文件名仅作演示。下载完成后，你只需要输入 QQ 的开头，再按 TAb，便会自动补全整个文件名</span></span></code></pre>
 <p><img src="/docs/queqiao.assets/image-20260517202308642.png" alt="image-20260517202308642"></p>
 <p>至此，Napcat 就成功安装好了。接下来我们需要将机器人账号登录上去</p>
-<h3 id="2-在-napcat-上登录机器人账号">2. 在 Napcat 上登录机器人账号</h3> <footer class="content-footer"> <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a> </footer> </main> </div> <script>
+<h3 id="2-启动-napcat">2. 启动 Napcat</h3>
+<p>通过上一步中的 <code>chmod +x</code> 命令，Napcat 的 AppImage 文件已经有了直接执行的权限。此时，只需要直接输入其 AppImage 文件的相对或绝对路径，即可启动 Napcat 了</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">./QQ-44343_NapCat-v4.18.2-amd64.AppImage</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 本文件名只作演示，请根据情况更改</span></span></code></pre>
+<p>如果启动时显示 <code>error loading libfuse.so.2</code>，例如这样的文本：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>vm-user@debian:~/bot/napcat$ ./QQ-44343_NapCat-v4.18.2-amd64.AppImage </span></span>
+<span class="line"><span>dlopen(): error loading libfuse.so.2</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>AppImages require FUSE to run. </span></span>
+<span class="line"><span>You might still be able to extract the contents of this AppImage </span></span>
+<span class="line"><span>if you run it with the --appimage-extract option. </span></span>
+<span class="line"><span>See https://github.com/AppImage/AppImageKit/wiki/FUSE </span></span>
+<span class="line"><span>for more information</span></span></code></pre>
+<p>这里显示缺失 <code>fuse</code> 库是因为，如果我们的 Linux 发行版较新，则在上一步中的安装时会安装的版本为 <code>fuse3</code>，而很多 AppImage，包括 Napcat 的 AppImage 文件需要的是 <code>fuse3</code>。我们需要显式的选择 <code>fuse2</code> 进行安装</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">sudo</span><span style="color:#9ECBFF"> apt</span><span style="color:#9ECBFF"> install</span><span style="color:#9ECBFF"> libfuse2</span></span></code></pre>
+<p><img  src="/docs/_astro/image-20260518045810713.KsP7QEmk_2aBdhu.webp" alt="image-20260518045810713" loading="lazy" decoding="async" width="705" height="1223"></p>
+<p>正常启动后，终端中将会显示登录二维码、WebUI 链接等信息。</p>
+<p><img  src="/docs/_astro/image-20260518050531885.CJPheGAI_2lO5gV.webp" alt="image-20260518050531885" loading="lazy" decoding="async" width="705" height="1223"></p>
+<h3 id="3-登录机器人账号">3. 登录机器人账号</h3>
+<p>通过上一步，我们成功启动了 Napcat，终端中显示了登录二维码和 WebUI 链接。前者用于登录，后者用于配置 Napcat</p>
+<p>我们先将控制台中显示的 WebUI 链接复制下来，你可以把这个链接通过 QQ 发给自己。注意，这个链接的后半段参数为 WebUI 的密码，所以一定不要泄露了。链接应该类似这样：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>http://127.0.0.1:6099/webui?token=62f1f8b5e323</span></span></code></pre>
+<p>接下来，我们使用手机登录机器人 QQ 号，并扫码登录</p>
+<p>当在终端能看到所有机器人同步到的私聊和群聊消息时，就说明登录成功了</p>
+<p>我们还需要更多信息才能继续配置 Napcat。下一章，我们将进行 Nonebot 的配置</p>
+<p><img  src="/docs/_astro/vmware_BX5GwnasHE.AmEst-95_1Alkv8.webp" alt="vmware_BX5GwnasHE" loading="lazy" decoding="async" width="691" height="1223"></p>
+<h2 id="二nonebot-的安装与配置">二、Nonebot 的安装与配置</h2>
+<blockquote>
+<p>Nonebot 的官方配置教程页在这里：<a href="https://nonebot.dev/docs/quick-start">快速上手</a></p>
+</blockquote>
+<p>与 Napcat 不同，Nonebot 不是一个独立运行的程序，而是一个 Python 包。这是为了利用 Python 上丰富的生态来为机器人创建多种多样的功能。</p>
+<h3 id="1-准备-python-环境">1. 准备 Python 环境</h3>
+<p>Nonebot 需要 Python 3.9 以上的版本。我们还需要安装 <code>pip</code>, <code>venv</code> 和 <code>python-is-python3</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">sudo</span><span style="color:#9ECBFF"> apt</span><span style="color:#9ECBFF"> update</span><span style="color:#6A737D"> # 更新是为了确保等下安装的包是最新的</span></span>
+<span class="line"><span style="color:#B392F0">sudo</span><span style="color:#9ECBFF"> apt</span><span style="color:#9ECBFF"> install</span><span style="color:#9ECBFF"> python3</span><span style="color:#9ECBFF"> python3-pip</span><span style="color:#9ECBFF"> python3-venv</span><span style="color:#9ECBFF"> python-is-python3</span></span></code></pre>
+<p>安装好后，我们需要使用 pip 来安装 pipx</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">python</span><span style="color:#79B8FF"> -m</span><span style="color:#9ECBFF"> pip</span><span style="color:#9ECBFF"> install</span><span style="color:#79B8FF"> --user</span><span style="color:#9ECBFF"> pipx</span></span>
+<span class="line"><span style="color:#B392F0">python</span><span style="color:#79B8FF"> -m</span><span style="color:#9ECBFF"> pipx</span><span style="color:#9ECBFF"> ensurepath</span></span></code></pre>
+<p>其中：</p>
+<ul>
+<li><code>python3</code> 是 Python 本体，因为 Python2 和 3 的差异很大，所以所有 Python3 的包都会带 <code>python3</code> 的字样。很多系统都会自带 Python3，但以免万一，我们这里还是安装一下（如果已经安装，则不会重复安装）</li>
+<li><code>python3-pip</code> 是 pip，用于安装第三方包，也可以称作库，是一些社区制作的用于实现特定功能的程序。Nonebot 就是一个第三方包</li>
+<li><code>python3-venv</code> 是 venv，也就是我们常说的虚拟环境，用于隔离第三方包。使用虚拟环境是为了避免版本冲突、保持系统整洁和避免影响系统本体。只言片语很难说明白为什么要使用虚拟环境，只需要记得，当需要安装 Python 包时，一定要在虚拟环境下进行</li>
+<li><code>python-is-python3</code> 是一个便利性包，功能很简单，就是添加了一个<code>软链接</code>，让你在终端输入 <code>python</code> 时，自动指向 <code>python3</code>，就不需要每次输入命令时都要加个 3 了</li>
+<li><code>pipx</code> 是 pipx，与用于安装包/库的 pip 不同，pipx 更侧重于安装成品应用。pip 和 pipx 都是从同一个来源下载包，但 pipx 会自动为安装好后的包创建一个独立的虚拟环境，并且随处可用。一般来说，我们使用 pipx 当应用直接装到系统全局环境里，而将使用 pip 安装的包安装到虚拟环境里</li>
+</ul> <footer class="content-footer"> <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a> </footer> </main> </div> <script>
       const themeButton = document.querySelector(".theme-toggle");
       function setTheme(theme) {
         document.documentElement.dataset.theme = theme;
