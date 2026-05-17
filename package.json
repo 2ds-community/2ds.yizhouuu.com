@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "build:docs": "pnpm --dir docs-astro build",
+    "dev:docs": "pnpm --dir docs-astro dev --host 0.0.0.0"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
+

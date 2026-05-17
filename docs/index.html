@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="2d 服文档库，收录 2d 服相关教程。"><title>2d 服文档库</title><script>
+      const savedTheme = localStorage.getItem("docs-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = savedTheme ?? (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+    </script><link rel="stylesheet" href="/docs/_astro/DocsLayout.Cx4RQG_k.css"></head> <body> <div class="docs-app"> <header class="topbar"> <a class="brand" href="/docs/" aria-label="2d 服文档库首页"> <span>2d 服文档库</span> </a> <div class="topbar-actions"> <nav class="site-links" aria-label="站点链接"> <a href="/">2d 服首页</a> </nav> <button class="theme-toggle" type="button" aria-label="切换到黑色模式"> <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24"> <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"></path> </svg> <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24"> <circle cx="12" cy="12" r="4"></circle> <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path> </svg> </button> </div> </header> <div class="docs-layout"> <aside class="sidebar" aria-label="2d 服文档库导航"> <section class="nav-group"> <h2>2d 服文档库</h2> <ul> <li> <a href="/docs/" aria-current="page"> 文档库首页 </a> </li><li> <a href="/docs/queqiao/"> 鹊桥教程 </a> </li> </ul> </section> </aside> <main class="content" id="content">  <h1>2d 服文档库</h1> <ul class="doc-index"> <li> <a href="/docs/queqiao/">面向新手的使用鹊桥搭建 MC 服务器 QQ 互联指南</a> </li> </ul>  <footer class="content-footer"> <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a> </footer> </main> </div> </div> <script>
+      const themeButton = document.querySelector(".theme-toggle");
+
+      function setTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem("docs-theme", theme);
+
+        if (themeButton) {
+          themeButton.setAttribute("aria-pressed", String(theme === "dark"));
+          themeButton.setAttribute(
+            "aria-label",
+            theme === "dark" ? "切换到白色模式" : "切换到黑色模式",
+          );
+        }
+      }
+
+      setTheme(document.documentElement.dataset.theme || "light");
+
+      themeButton?.addEventListener("click", () => {
+        const current = document.documentElement.dataset.theme || "light";
+        setTheme(current === "dark" ? "light" : "dark");
+      });
+
+      function copyText(text) {
+        if (navigator.clipboard?.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.append(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        return Promise.resolve();
+      }
+
+      document.querySelectorAll(".content pre").forEach((pre) => {
+        const code = pre.querySelector("code");
+        if (!code || pre.parentElement?.classList.contains("code-block")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "code-block";
+        pre.before(wrapper);
+        wrapper.append(pre);
+
+        const button = document.createElement("button");
+        button.className = "copy-code";
+        button.type = "button";
+        button.textContent = "复制";
+        button.setAttribute("aria-label", "复制代码");
+        wrapper.append(button);
+
+        button.addEventListener("click", async () => {
+          try {
+            await copyText(code.textContent || "");
+            button.textContent = "已复制";
+          } catch {
+            button.textContent = "复制失败";
+          }
+
+          window.setTimeout(() => {
+            button.textContent = "复制";
+          }, 1600);
+        });
+      });
+    </script> </body> </html>

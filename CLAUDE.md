@@ -4,13 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development commands
 
-This repository is a plain static site with no package manager, build pipeline, linter, or automated test suite checked in.
+This repository is mostly a plain static site. A small Astro subproject under `docs-astro/` builds only the `/docs/` subtree. There is no linter or automated test suite checked in.
 
 - Start a local preview server from the repo root:
   - `python3 -m http.server 8000`
 - Open the pages directly in the browser while the server is running:
   - Landing page: `http://localhost:8000/index.html`
   - Onboarding page: `http://localhost:8000/onboarding.html`
+  - Docs page: `http://localhost:8000/docs/`
+- Build the Astro docs subtree:
+  - `pnpm run build:docs`
+- Start the Astro docs development server:
+  - `pnpm run dev:docs`
 
 Because there is no automated lint/test setup in the repo, validation is manual:
 - Reload both pages after edits.
@@ -21,11 +26,18 @@ Because there is no automated lint/test setup in the repo, validation is manual:
 ## Architecture overview
 
 This codebase is a two-page static website for the 2dserver Minecraft community.
+The root static site is still deployed directly from the repository root.
+Astro is used only for the `/docs/` subtree.
 
 ### Page split
 
 - `index.html` is the landing page.
 - `onboarding.html` is the guided onboarding flow for new players.
+- `docs-astro/` contains the Astro source for the docs subtree.
+- `docs/` is the generated Astro output served at `/docs/`.
+
+Do not hand-edit files in `docs/`; they are overwritten by `pnpm run build:docs`.
+Edit docs pages under `docs-astro/src/pages/` instead.
 
 Each page has its own page-specific stylesheet and script:
 - Landing page: `css/index.css`, `js/index.js`

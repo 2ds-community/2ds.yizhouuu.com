@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="手把手从零搭建互联"><title>面向新手的使用鹊桥搭建 MC 服务器 QQ 互联指南 | 2d 服文档库</title><script>
+      const savedTheme = localStorage.getItem("docs-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = savedTheme ?? (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+    </script><link rel="stylesheet" href="/docs/_astro/DocsLayout.Cx4RQG_k.css"></head> <body> <div class="docs-app"> <header class="topbar"> <a class="brand" href="/docs/" aria-label="2d 服文档库首页"> <span>2d 服文档库</span> </a> <div class="topbar-actions"> <nav class="site-links" aria-label="站点链接"> <a href="/">2d 服首页</a> </nav> <button class="theme-toggle" type="button" aria-label="切换到黑色模式"> <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24"> <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"></path> </svg> <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24"> <circle cx="12" cy="12" r="4"></circle> <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path> </svg> </button> </div> </header> <div class="docs-layout"> <aside class="sidebar" aria-label="2d 服文档库导航"> <section class="nav-group"> <h2>2d 服文档库</h2> <ul> <li> <a href="/docs/"> 文档库首页 </a> </li><li> <a href="/docs/queqiao/" aria-current="page"> 鹊桥教程 </a> </li> </ul> </section> </aside> <main class="content" id="content"> <h1 id="面向新手的使用鹊桥搭建-mc-服务器-qq-互联指南">面向新手的使用鹊桥搭建 MC 服务器 QQ 互联指南</h1>
+<p>本文是一份面向新手的使用鹊桥搭建 MC &#x3C;> QQ 互联指南，并以全新的、无图形界面的 Linux（Debian 13）进行演示。</p>
+<p>本文主要使用的软件有 <a href="https://napneko.github.io">Napcat</a>、<a href="https://nonebot.dev">Nonebot</a> 和 <a href="https://queqiao-docs.pages.dev">鹊桥</a>。</p>
+<p><strong>Napcat</strong> 是一款运行在命令行中的“QQ客户端”。它将消息接发等功能暴露给其他软件，开发者得以将自己的功能接入 QQ</p>
+<p><strong>Nonebot</strong> 是一款专门的机器人软件，负责机器人的逻辑处理，是实现机器人具体功能的软件。我们将 Napcat 接入 Nonebot，便让 Nonebot 有了操控 QQ 的能力</p>
+<p><strong>鹊桥</strong> 是一款安装在 Minecraft 服务器中的模组/插件。顾名思义，其作为是为 Minecraft 搭起一座与外部世界沟通的桥梁。我们将鹊桥接入 Nonebot，就可以让机器人将消息转发到 Minecraft，亦可将消息转发回 QQ</p>
+<hr>
+<h2 id="一napcat-的安装与配置">一、Napcat 的安装与配置</h2>
+<p>Napcat 的官方下载页为：<a href="https://napneko.github.io/guide/install">https://napneko.github.io/guide/install</a></p>
+<p>Windows 端推荐选择 Napcat.Win.一键版本。官方教程<a href="https://napneko.github.io/guide/boot/Shell#napcat-win-%E4%B8%80%E9%94%AE%E7%89%88%E6%9C%AC">点这里</a><br>
+Linux 端推荐选择 AppImage 版本。官方教程<a href="https://napneko.github.io/guide/boot/Shell#napcat-appimage">点这里</a><br>
+Mac 和 Termux 端建议选择 Docker 版本。官方教程<a href="https://napneko.github.io/guide/boot/Shell#napcat-docker-linux%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2">点这里</a></p>
+<h3 id="1-安装-napcat">1. 安装 Napcat</h3>
+<p>本文演示用的系统是 Linux Debian，因此选择 AppImage 版本。使用上述链接</p>
+<p><img src="/docs/queqiao.assets/image-20260517191449052.png" alt="image-20260517191449052"></p>
+<p>阅读完官方介绍后，发现下载链接在 <a href="https://github.com/NapNeko/NapCatAppImageBuild/releases">AppImage 仓库</a></p>
+<p><img src="/docs/queqiao.assets/image-20260517191923320.png" alt="image-20260517191923320"></p>
+<p>除非特殊情况，否则直接选择 <code>.amd64.AppImage</code> 结尾的文件下载即可。通过下载页提示，我们需要先安装 <code>fuse</code> 和 <code>xvfb</code> 库作为前置。同时，为了方便从网络上直接将软件下载到服务器，我们再安装一个 <code>wget</code> 工具</p>
+<p>让我先处理前置：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">sudo</span><span style="color:#9ECBFF"> apt</span><span style="color:#9ECBFF"> update</span><span style="color:#6A737D"> # 更新软件仓库，尤其是刚安装的系统，一定要进行一次 update</span></span>
+<span class="line"><span style="color:#B392F0">sudo</span><span style="color:#9ECBFF"> apt</span><span style="color:#9ECBFF"> install</span><span style="color:#79B8FF"> -y</span><span style="color:#9ECBFF"> fuse</span><span style="color:#9ECBFF"> xvfb</span><span style="color:#9ECBFF"> wget</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<p>你可以直接将这两行一起复制到终端并按下回车执行。可能会提示你输入密码，输入后按下回车继续执行即可</p>
+<p><img src="/docs/queqiao.assets/image-20260517195846043.png" alt="image-20260517195846043"></p>
+<p>安装完前置后，我们来安装 Napcat。首先，我们先前往我们的<code>家目录</code>，在这里创建一个用来放置机器人相关软件、文件的目录，例如叫 <code>bot</code>。然后再在 <code>bot</code> 目录下建一个叫 <code>napcat</code> 的目录用来放 Napcat。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#79B8FF">cd</span><span style="color:#6A737D"> # 前往自己的家目录</span></span>
+<span class="line"><span style="color:#B392F0">mkdir</span><span style="color:#9ECBFF"> bot</span><span style="color:#6A737D"> # 在当前路径下创建名为 bot 的目录</span></span>
+<span class="line"><span style="color:#79B8FF">cd</span><span style="color:#9ECBFF"> bot</span><span style="color:#6A737D"> # 前往当下路径下的 bot 目录</span></span>
+<span class="line"><span style="color:#B392F0">mkdir</span><span style="color:#9ECBFF"> napcat</span></span>
+<span class="line"><span style="color:#79B8FF">cd</span><span style="color:#9ECBFF"> napcat</span></span></code></pre>
+<p>然后，我们进入创建好的 <code>napcat</code> 目录，将 Napcat 的 AppImage 文件下载下来，并给予运行权限。我们不直接在自己的电脑上下载 napcat 程序，而是复制其链接，并在服务器上直接下载</p>
+<p><img src="/docs/queqiao.assets/image-20260517200646364.png" alt="image-20260517200646364"></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">wget</span><span style="color:#9ECBFF"> https://v6.gh-proxy.org/https://github.com/NapNeko/NapCatAppImageBuild/releases/download/v4.18.2/QQ-44343_NapCat-v4.18.2-amd64.AppImage</span></span>
+<span class="line"><span style="color:#6A737D"># 该处链接仅作演示。Napcat 更新频率高，请尽量用最新版的 Napcat，否则可能出现登录异常等问题。</span></span>
+<span class="line"><span style="color:#6A737D"># 本链接使用了 gh-proxy.com 的反代，以便在大陆机器上安装，只需要在原始的链接前加上 v6.ghproxy.org/ 即可。</span></span>
+<span class="line"><span style="color:#6A737D"># 详情请查阅 gh-proxy.com 官网。我们不为该服务负责</span></span>
+<span class="line"><span style="color:#B392F0">chmod</span><span style="color:#9ECBFF"> +x</span><span style="color:#9ECBFF"> QQ-44343_NapCat-v4.18.2-amd64.AppImage</span></span>
+<span class="line"><span style="color:#6A737D"># 该处文件名仅作演示。下载完成后，你只需要输入 QQ 的开头，再按 TAb，便会自动补全整个文件名</span></span></code></pre>
+<p><img src="/docs/queqiao.assets/image-20260517202308642.png" alt="image-20260517202308642"></p>
+<p>至此，Napcat 就成功安装好了。接下来我们需要将机器人账号登录上去</p>
+<h3 id="2-在-napcat-上登录机器人账号">2. 在 Napcat 上登录机器人账号</h3> <footer class="content-footer"> <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a> </footer> </main> </div> </div> <script>
+      const themeButton = document.querySelector(".theme-toggle");
+
+      function setTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem("docs-theme", theme);
+
+        if (themeButton) {
+          themeButton.setAttribute("aria-pressed", String(theme === "dark"));
+          themeButton.setAttribute(
+            "aria-label",
+            theme === "dark" ? "切换到白色模式" : "切换到黑色模式",
+          );
+        }
+      }
+
+      setTheme(document.documentElement.dataset.theme || "light");
+
+      themeButton?.addEventListener("click", () => {
+        const current = document.documentElement.dataset.theme || "light";
+        setTheme(current === "dark" ? "light" : "dark");
+      });
+
+      function copyText(text) {
+        if (navigator.clipboard?.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.append(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        return Promise.resolve();
+      }
+
+      document.querySelectorAll(".content pre").forEach((pre) => {
+        const code = pre.querySelector("code");
+        if (!code || pre.parentElement?.classList.contains("code-block")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "code-block";
+        pre.before(wrapper);
+        wrapper.append(pre);
+
+        const button = document.createElement("button");
+        button.className = "copy-code";
+        button.type = "button";
+        button.textContent = "复制";
+        button.setAttribute("aria-label", "复制代码");
+        wrapper.append(button);
+
+        button.addEventListener("click", async () => {
+          try {
+            await copyText(code.textContent || "");
+            button.textContent = "已复制";
+          } catch {
+            button.textContent = "复制失败";
+          }
+
+          window.setTimeout(() => {
+            button.textContent = "复制";
+          }, 1600);
+        });
+      });
+    </script> </body> </html>
