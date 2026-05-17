@@ -31,9 +31,35 @@ const pageTitle = title === "2d 服文档库" ? "2d 服文档库" : `${title} | 
   <body>
     <div class="docs-app">
       <header class="topbar">
-        <a class="brand" href="/docs/" aria-label="2d 服文档库首页">
-          <span>2d 服文档库</span>
-        </a>
+        <div class="topbar-left">
+          <a class="brand" href="/docs/">2d 服文档库</a>
+          <div class="nav-dropdown">
+            <button class="nav-trigger" type="button" aria-expanded="false">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span>目录</span>
+              <svg class="nav-chevron" width="10" height="10" viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </button>
+            <nav class="nav-panel" aria-label="文档导航">
+              {docNav.map((group) => (
+                <section class="nav-group">
+                  <ul>
+                    {group.items.map((item) => (
+                      <li>
+                        <a href={item.href} aria-current={currentPath === item.href ? "page" : undefined}>
+                          {item.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </nav>
+          </div>
+        </div>
         <div class="topbar-actions">
           <nav class="site-links" aria-label="站点链接">
             {siteLinks.map((link) => <a href={link.href}>{link.label}</a>)}
@@ -50,104 +76,84 @@ const pageTitle = title === "2d 服文档库" ? "2d 服文档库" : `${title} | 
         </div>
       </header>
 
-      <div class="docs-layout">
-        <aside class="sidebar" aria-label="2d 服文档库导航">
-          {
-            docNav.map((group) => (
-              <section class="nav-group">
-                <h2>{group.label}</h2>
-                <ul>
-                  {group.items.map((item) => (
-                    <li>
-                      <a
-                        href={item.href}
-                        aria-current={currentPath === item.href ? "page" : undefined}
-                      >
-                        {item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))
-          }
-        </aside>
-
-        <main class="content" id="content">
-          <slot />
-          <footer class="content-footer">
-            <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a>
-          </footer>
-        </main>
-      </div>
+      <main class="content" id="content">
+        <slot />
+        <footer class="content-footer">
+          <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a>
+        </footer>
+      </main>
     </div>
     <script is:inline>
       const themeButton = document.querySelector(".theme-toggle");
-
       function setTheme(theme) {
         document.documentElement.dataset.theme = theme;
         localStorage.setItem("docs-theme", theme);
-
         if (themeButton) {
           themeButton.setAttribute("aria-pressed", String(theme === "dark"));
-          themeButton.setAttribute(
-            "aria-label",
-            theme === "dark" ? "切换到白色模式" : "切换到黑色模式",
-          );
+          themeButton.setAttribute("aria-label", theme === "dark" ? "切换到白色模式" : "切换到黑色模式");
         }
       }
-
       setTheme(document.documentElement.dataset.theme || "light");
-
       themeButton?.addEventListener("click", () => {
         const current = document.documentElement.dataset.theme || "light";
         setTheme(current === "dark" ? "light" : "dark");
       });
 
-      function copyText(text) {
-        if (navigator.clipboard?.writeText) {
-          return navigator.clipboard.writeText(text);
+      // Nav dropdown toggle
+      const trigger = document.querySelector(".nav-trigger");
+      const dropdown = document.querySelector(".nav-dropdown");
+      trigger?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const open = dropdown.classList.toggle("is-open");
+        trigger.setAttribute("aria-expanded", String(open));
+      });
+      document.addEventListener("click", (e) => {
+        if (dropdown && !dropdown.contains(e.target)) {
+          dropdown.classList.remove("is-open");
+          trigger?.setAttribute("aria-expanded", "false");
         }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && dropdown?.classList.contains("is-open")) {
+          dropdown.classList.remove("is-open");
+          trigger?.setAttribute("aria-expanded", "false");
+          trigger?.focus();
+        }
+      });
 
-        const textarea = document.createElement("textarea");
-        textarea.value = text;
-        textarea.setAttribute("readonly", "");
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.append(textarea);
-        textarea.select();
+      // Copy code buttons
+      function copyText(text) {
+        if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.append(ta);
+        ta.select();
         document.execCommand("copy");
-        textarea.remove();
+        ta.remove();
         return Promise.resolve();
       }
-
       document.querySelectorAll(".content pre").forEach((pre) => {
         const code = pre.querySelector("code");
         if (!code || pre.parentElement?.classList.contains("code-block")) return;
-
         const wrapper = document.createElement("div");
         wrapper.className = "code-block";
         pre.before(wrapper);
         wrapper.append(pre);
-
         const button = document.createElement("button");
         button.className = "copy-code";
         button.type = "button";
         button.textContent = "复制";
         button.setAttribute("aria-label", "复制代码");
         wrapper.append(button);
-
         button.addEventListener("click", async () => {
           try {
             await copyText(code.textContent || "");
             button.textContent = "已复制";
-          } catch {
-            button.textContent = "复制失败";
-          }
-
-          window.setTimeout(() => {
-            button.textContent = "复制";
-          }, 1600);
+          } catch { button.textContent = "复制失败"; }
+          setTimeout(() => { button.textContent = "复制"; }, 1600);
         });
       });
     </script>

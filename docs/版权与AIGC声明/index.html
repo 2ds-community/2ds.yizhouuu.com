@@ -3,75 +3,79 @@
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       const theme = savedTheme ?? (prefersDark ? "dark" : "light");
       document.documentElement.dataset.theme = theme;
-    </script><link rel="stylesheet" href="/docs/_astro/DocsLayout.Cx4RQG_k.css"></head> <body> <div class="docs-app"> <header class="topbar"> <a class="brand" href="/docs/" aria-label="2d 服文档库首页"> <span>2d 服文档库</span> </a> <div class="topbar-actions"> <nav class="site-links" aria-label="站点链接"> <a href="/">2d 服首页</a> </nav> <button class="theme-toggle" type="button" aria-label="切换到黑色模式"> <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24"> <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"></path> </svg> <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24"> <circle cx="12" cy="12" r="4"></circle> <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path> </svg> </button> </div> </header> <div class="docs-layout"> <aside class="sidebar" aria-label="2d 服文档库导航"> <section class="nav-group"> <h2>2d 服文档库</h2> <ul> <li> <a href="/docs/"> 文档库首页 </a> </li><li> <a href="/docs/queqiao/"> 鹊桥教程 </a> </li> </ul> </section> </aside> <main class="content" id="content"> <h1 id="版权与-aigc-声明">版权与 AIGC 声明</h1>
+    </script><link rel="stylesheet" href="/docs/_astro/DocsLayout.zutagnoO.css"></head> <body> <div class="docs-app"> <header class="topbar"> <div class="topbar-left"> <a class="brand" href="/docs/">2d 服文档库</a> <div class="nav-dropdown"> <button class="nav-trigger" type="button" aria-expanded="false"> <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"> <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> </svg> <span>目录</span> <svg class="nav-chevron" width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"> <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path> </svg> </button> <nav class="nav-panel" aria-label="文档导航"> <section class="nav-group"> <ul> <li> <a href="/docs/"> 文档库首页 </a> </li><li> <a href="/docs/queqiao/"> 鹊桥教程 </a> </li> </ul> </section> </nav> </div> </div> <div class="topbar-actions"> <nav class="site-links" aria-label="站点链接"> <a href="/">2d 服首页</a> </nav> <button class="theme-toggle" type="button" aria-label="切换到黑色模式"> <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24"> <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"></path> </svg> <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24"> <circle cx="12" cy="12" r="4"></circle> <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path> </svg> </button> </div> </header> <main class="content" id="content"> <h1 id="版权与-aigc-声明">版权与 AIGC 声明</h1>
 <p>本站所有文章皆为原创，所有文章皆无 AI 参与和任何 AIGC 内容。</p>
-<p>本站 Astro 样式与功能由 gpt-5.5 制作</p> <footer class="content-footer"> <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a> </footer> </main> </div> </div> <script>
+<p>本站 Astro 样式与功能由 gpt-5.5 制作</p> <footer class="content-footer"> <a href="/docs/版权与AIGC声明/">版权与 AIGC 声明</a> </footer> </main> </div> <script>
       const themeButton = document.querySelector(".theme-toggle");
-
       function setTheme(theme) {
         document.documentElement.dataset.theme = theme;
         localStorage.setItem("docs-theme", theme);
-
         if (themeButton) {
           themeButton.setAttribute("aria-pressed", String(theme === "dark"));
-          themeButton.setAttribute(
-            "aria-label",
-            theme === "dark" ? "切换到白色模式" : "切换到黑色模式",
-          );
+          themeButton.setAttribute("aria-label", theme === "dark" ? "切换到白色模式" : "切换到黑色模式");
         }
       }
-
       setTheme(document.documentElement.dataset.theme || "light");
-
       themeButton?.addEventListener("click", () => {
         const current = document.documentElement.dataset.theme || "light";
         setTheme(current === "dark" ? "light" : "dark");
       });
 
-      function copyText(text) {
-        if (navigator.clipboard?.writeText) {
-          return navigator.clipboard.writeText(text);
+      // Nav dropdown toggle
+      const trigger = document.querySelector(".nav-trigger");
+      const dropdown = document.querySelector(".nav-dropdown");
+      trigger?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const open = dropdown.classList.toggle("is-open");
+        trigger.setAttribute("aria-expanded", String(open));
+      });
+      document.addEventListener("click", (e) => {
+        if (dropdown && !dropdown.contains(e.target)) {
+          dropdown.classList.remove("is-open");
+          trigger?.setAttribute("aria-expanded", "false");
         }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && dropdown?.classList.contains("is-open")) {
+          dropdown.classList.remove("is-open");
+          trigger?.setAttribute("aria-expanded", "false");
+          trigger?.focus();
+        }
+      });
 
-        const textarea = document.createElement("textarea");
-        textarea.value = text;
-        textarea.setAttribute("readonly", "");
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.append(textarea);
-        textarea.select();
+      // Copy code buttons
+      function copyText(text) {
+        if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.append(ta);
+        ta.select();
         document.execCommand("copy");
-        textarea.remove();
+        ta.remove();
         return Promise.resolve();
       }
-
       document.querySelectorAll(".content pre").forEach((pre) => {
         const code = pre.querySelector("code");
         if (!code || pre.parentElement?.classList.contains("code-block")) return;
-
         const wrapper = document.createElement("div");
         wrapper.className = "code-block";
         pre.before(wrapper);
         wrapper.append(pre);
-
         const button = document.createElement("button");
         button.className = "copy-code";
         button.type = "button";
         button.textContent = "复制";
         button.setAttribute("aria-label", "复制代码");
         wrapper.append(button);
-
         button.addEventListener("click", async () => {
           try {
             await copyText(code.textContent || "");
             button.textContent = "已复制";
-          } catch {
-            button.textContent = "复制失败";
-          }
-
-          window.setTimeout(() => {
-            button.textContent = "复制";
-          }, 1600);
+          } catch { button.textContent = "复制失败"; }
+          setTimeout(() => { button.textContent = "复制"; }, 1600);
         });
       });
     </script> </body> </html>
