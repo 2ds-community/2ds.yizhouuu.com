@@ -47,6 +47,19 @@ Shared UI behavior lives in:
 - `css/common.css` — shared server-address / copy-to-clipboard styling
 - `js/copy-address.js` — shared clipboard interaction for elements with `.server-address[data-copy]`
 
+### Docs subtree (Astro)
+
+The docs site uses a single-column centered layout with a topbar dropdown for navigation.
+
+- `docs-astro/src/layouts/DocsLayout.astro` — the shared layout. Contains the topbar (brand, nav dropdown, site links, theme toggle), centered `<main class="content">`, and inline scripts for theme switching, dropdown toggle, and code-copy buttons.
+- `docs-astro/src/styles/docs.css` — all docs styling. Uses the same warm cream palette and glass morphism as the main site, with green (`#4a7f5e` light / `#7aab8e` dark) as the accent/link color to match the onboarding page.
+- `docs-astro/src/data/navigation.ts` — exports `docNav` (dropdown items) and `siteLinks` (topbar right-side links).
+- `docs-astro/src/pages/` — markdown and Astro page files.
+
+The navigation is a click-triggered dropdown in the topbar (not a sidebar). It opens/closes via a `.is-open` class toggled by inline JS, with Escape-to-close support. There is no sidebar or grid layout; content is simply `max-width: 700px; margin: 0 auto`.
+
+When adding a new docs page, add its entry to `docNav` in `navigation.ts`.
+
 ### Landing page flow
 
 The landing page is mostly static markup plus a JS-driven image carousel.
